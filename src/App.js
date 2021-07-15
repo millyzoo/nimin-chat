@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import GlobalStyle from "./constants/globalStyle";
+import Footer from "./components/Footer";
+import { HashRouter, Switch, Route } from "react-router-dom";
+import { HomePage, ModePage, ChatPage } from "./pages"
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HashRouter>
+      <GlobalStyle />
+        <Switch>
+          <Route exact path="/" component={HomePage}/>
+          <Route path="/mode" component={ModePage}/>
+          <Route path="/chat" component={ChatPage}/>
+        </Switch>
+      <Footer />
+    </HashRouter>
   );
 }
-
-export default App;
