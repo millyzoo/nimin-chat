@@ -1,7 +1,9 @@
-import React from "react";
-import styled from "styled-components";
-import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
-import { Wrapper } from "../../constants/mainStyle";
+import React, { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { useHistory } from "react-router-dom";
+import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
+import { Wrapper, SubmitButton } from '../../constants/mainStyle';
+import { AuthContext } from '../../contexts'
 
 const Form = styled.form`
   padding: 40px;
@@ -53,7 +55,7 @@ const Input = styled.input`
   }
 `
 
-const OptionContainer = styled.div`
+const AvatarContainer = styled.div`
   display: flex;
   margin: 10px 0 30px 0;
 `
@@ -95,7 +97,7 @@ const Option = styled.label`
   }
 `
 
-const OptionImage = styled.div`
+const Avatar = styled.div`
   margin-bottom: 10px;
   width: 30px;
   height: 30px;
@@ -103,61 +105,87 @@ const OptionImage = styled.div`
   border-radius: 50%;
 `
 
-const SubmitButton = styled.input`
-  padding: 12px;
-  border-radius: 50px;
-  width: 100%;
-  border: none;
-  background-color: #00b9a3;
-  color: #ffffff;
-  font-size: 1.125rem;
-  cursor: pointer;
-  transition: all 0.3s;
-
-  &:hover {
-    background-color: #00ad98;
-  }
-`
-
 export default function HomePage() {
+  const [errorMessages, setErrorMessages] = useState("");
+  const [currentUser, setCurrentUser] = useState({
+    username: "",
+    avatar: "",
+  });
+  const { setIsUserLogin } = useContext(AuthContext);
+  const history = useHistory();
 
   const handleSubmit = e => {
     e.preventDefault();
+    if (!currentUser.username && !currentUser.avatar) {
+      setErrorMessages('資料填寫不齊全')
+      return
+    } else if (!currentUser.username) {
+      setErrorMessages('尚未填寫名字')
+      return
+    } else if (!currentUser.avatar) {
+      setErrorMessages('尚未選擇頭貼')
+      return
+    }
+    setErrorMessages("")
+    setIsUserLogin(true)
+    history.push("/mode");
   }
+
+  const handleUsernameChange = e => {
+    switch (e.target.name) {
+      case "username":
+        setCurrentUser({
+          ...currentUser,
+          username: e.target.value,
+        })
+        setErrorMessages("")
+        break;
+      case "avatar":
+        setCurrentUser({
+          ...currentUser,
+          avatar: e.target.value
+        })
+        setErrorMessages("")
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
     <Wrapper>
       <Form onSubmit={handleSubmit}>
         <Title>NIMIN CHAT</Title>
         <InputContainer>
-          <label htmlFor="name">
+          <label htmlFor="username">
             名字
-            <InputErrorText>請輸入五個字以內</InputErrorText>
+            {errorMessages && <InputErrorText>{errorMessages}</InputErrorText>}
           </label>
-          <Input id="name" placeholder="請輸入名字" />
+          <Input id="username" name="username" placeholder="請填寫名字" onChange={handleUsernameChange} />
         </InputContainer>
         <p>選擇頭貼</p>
-        <OptionContainer>
+        <AvatarContainer>
           <Option htmlFor="option1">
-            <OptionImage background="#e0969b" />
-            <input type="radio" name="user-photo" id="option1" />
+            <Avatar background="#e0969b" />
+            <input type="radio" name="avatar" id="option1" value="#e0969b" onChange={handleUsernameChange} />
             <OptionButton />
           </Option>
           <Option htmlFor="option2">
-            <OptionImage background="#b59a92" />
-            <input type="radio" name="user-photo" id="option2" />
+            <Avatar background="#b59a92" />
+            <input type="radio" name="avatar" id="option2" value="#b59a92" onChange={handleUsernameChange} />
             <OptionButton />
           </Option>
           <Option htmlFor="option3">
-            <OptionImage background="#77bce2" />
-            <input type="radio" name="user-photo" id="option3" />
+            <Avatar background="#77bce2" />
+            <input type="radio" name="avatar" id="option3" value="#77bce2" onChange={handleUsernameChange} />
             <OptionButton />
           </Option>
           <Option htmlFor="option4">
-            <OptionImage background="#93a5d2" />
-            <input type="radio" name="user-photo" id="option4" />
+            <Avatar background="#93a5d2" />
+            <input type="radio" name="avatar" id="option4" value="#93a5d2" onChange={handleUsernameChange} />
             <OptionButton />
           </Option>
-        </OptionContainer>
+        </AvatarContainer>
         <SubmitButton type="submit" value="進入聊天室" />
       </Form>
     </Wrapper>
