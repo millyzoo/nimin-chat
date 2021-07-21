@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
-import { Wrapper } from "../../constants/mainStyle";
+import { Wrapper, SubmitButton } from "../../constants/mainStyle";
 import { Link } from "react-router-dom";
 import { FaUsers as UsersIcon, FaDoorOpen as DoorIcon } from 'react-icons/fa';
 import { BiMessageAdd as MessageAddIcon } from 'react-icons/bi';
 import { IoIosClose as CloseIcon } from 'react-icons/io';
+import { useHistory } from "react-router-dom";
+import { addChatRoom } from '../../WebAPI'
+import firebase from 'firebase';
+import { AuthContext } from '../../contexts';
 
 const Container = styled.div`
   width: 280px;
@@ -135,41 +139,82 @@ const Input = styled.input`
   }
 `
 
-const SubmitButton = styled(Link)`
-  padding: 12px;
-  border-radius: 50px;
-  width: 100%;
-  border: none;
-  background-color: #00b9a3;
-  color: #ffffff;
-  font-size: 1.125rem;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s;
-
-  &:hover {
-    background-color: #00ad98;
-  }
-`
-
-
 export default function ModePage() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [createRoomId, setCreateRoomId] = useState("")
+  const [joinRoomId, setJoinRoomId] = useState("")
+  const [errorMessages, setErrorMessages] = useState("");
+  const history = useHistory();
+  const reference = firebase.database().ref('chats').orderByChild('roomID')
+  const { isUserLogin } = useContext(AuthContext)
+
+  useEffect(() => {
+    if (!isUserLogin) {
+      history.push("/");
+      return
+    }
+  }, [history, isUserLogin])
 
   const handleJoinModalClick = () => {
     setIsJoinModalOpen(!isJoinModalOpen);
+    setErrorMessages("")
   };
 
   const handleCreateModalClick = () => {
     setIsCreateModalOpen(!isCreateModalOpen);
+    setErrorMessages("")
   };
+
+  const handleJoinRoomSubmit = e => {
+    e.preventDefault();
+
+    reference.equalTo(joinRoomId).once('value', (snapshot) => {
+      if (!joinRoomId) {
+        setErrorMessages('尚未輸入房間編號')
+        return
+      }
+
+      if (!snapshot.val()) {
+        setErrorMessages('此房間不存在')
+        return
+      }
+      
+      history.push(`/chat/${joinRoomId}`);
+    })
+  }
+
+  const handleCreateRoomSubmit = e => {
+    e.preventDefault();
+
+    reference.equalTo(createRoomId).once('value', (snapshot) => {
+      if (!createRoomId) {
+        setErrorMessages('尚未輸入房間編號')
+        return
+      }
+
+      if (snapshot.val()) {
+        setErrorMessages('此房間已存在')
+        return
+      }
+      
+      addChatRoom(createRoomId)
+      history.push(`/chat/${createRoomId}`);
+    })
+  }
+  
+  const handleCreateRoomIDChange = e => {
+    setCreateRoomId(e.target.value)
+  }
+  
+  const handleJoinRoomIDChange = e => {
+    setJoinRoomId(e.target.value)
+  }
 
   return (
     <Wrapper>
       <Container>
-        <ModeLink to="/chat">
+        <ModeLink to="/chat/lobby">
           <Mode>
             <UsersIcon />
             聊天大廳
@@ -185,14 +230,16 @@ export default function ModePage() {
             <ModalContent>
               <ModalCloseButton onClick={handleJoinModalClick}><CloseIcon /></ModalCloseButton>
               <ModalTitle>加入房間</ModalTitle>
-              <InputContainer>
-                <label htmlFor="room-id">
-                  房間編號
-                  <InputErrorText>此房間不存在</InputErrorText>
-                </label>
-                <Input id="room-id" placeholder="請輸入房間編號" />
-              </InputContainer>
-              <SubmitButton>加入</SubmitButton>
+              <form onSubmit={handleJoinRoomSubmit}>
+                <InputContainer>
+                  <label htmlFor="room-id">
+                    房間編號
+                    {errorMessages && <InputErrorText>{errorMessages}</InputErrorText>}
+                  </label>
+                  <Input id="room-id" placeholder="請輸入房間編號" onChange={handleJoinRoomIDChange} />
+                </InputContainer>
+                <SubmitButton type="submit" value="加入" />
+              </form>
             </ModalContent>
           </>
         )}
@@ -206,13 +253,16 @@ export default function ModePage() {
             <ModalContent>
               <ModalCloseButton onClick={handleCreateModalClick}><CloseIcon /></ModalCloseButton>
               <ModalTitle>創建房間</ModalTitle>
-              <InputContainer>
-                <label htmlFor="room-id">
-                  房間編號
-                  <InputErrorText>此房間已存在</InputErrorText></label>
-                <Input id="room-id" placeholder="請輸入房間編號" />
-              </InputContainer>
-              <SubmitButton>建立</SubmitButton>
+              <form onSubmit={handleCreateRoomSubmit}>
+                <InputContainer>
+                  <label htmlFor="room-id">
+                    房間編號
+                    {errorMessages && <InputErrorText>{errorMessages}</InputErrorText>}
+                  </label>
+                  <Input id="room-id" placeholder="請輸入房間編號" onChange={handleCreateRoomIDChange} />
+                </InputContainer>
+                <SubmitButton type="submit" value="建立" />
+              </form>
             </ModalContent>
           </>
         )}
