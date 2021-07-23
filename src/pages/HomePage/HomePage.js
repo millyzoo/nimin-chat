@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
 import { Wrapper, SubmitButton } from '../../constants/mainStyle';
 import { AuthContext } from '../../contexts'
+import { setUser } from '../../utils'
 
 const Form = styled.form`
   padding: 40px;
@@ -107,11 +108,7 @@ const Avatar = styled.div`
 
 export default function HomePage() {
   const [errorMessages, setErrorMessages] = useState("");
-  const [currentUser, setCurrentUser] = useState({
-    username: "",
-    avatar: "",
-  });
-  const { setIsUserLogin } = useContext(AuthContext);
+  const { setIsUserLogin, currentUser, setCurrentUser } = useContext(AuthContext);
   const history = useHistory();
 
   const handleSubmit = e => {
@@ -127,6 +124,7 @@ export default function HomePage() {
       return
     }
     setErrorMessages("")
+    setUser(currentUser)
     setIsUserLogin(true)
     history.push("/mode");
   }

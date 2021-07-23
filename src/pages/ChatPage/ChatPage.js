@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
 import { Wrapper } from "../../constants/mainStyle";
 import { FiSmile as EmojiIcon } from 'react-icons/fi';
 import { IoCloseCircle as ChatCloseIcon, IoSend as SendIcon } from "react-icons/io5";
 import { RiArrowLeftSLine as ArrowLeftIcon } from "react-icons/ri";
+import { AuthContext } from '../../contexts';
+import { useParams, useHistory } from "react-router-dom";
+import database from '../../config';
+import { getUser } from '../../utils'
+import { enterChatRoom, sendMessage, writeOnlineState } from '../../WebAPI'
 
 const ChatContainer = styled.div`
   margin-top: 40px;
@@ -174,33 +179,43 @@ const ChatContent = styled.div`
 const UserJoinChat = styled.p`
   display: inline-block;
   padding: 5px 15px;
-  height: fit-content;
   background-color: #e9e9e9;
   border-radius: 20px;
   font-size: 0.875rem;
+  margin: 7.5px 0;
 `
 
-const MyselfMessage = styled.p`
+const SelfMessage = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
   margin: 7.5px 0 7.5px auto;
-  padding: 7px 15px;
   max-width: 45%;
+
+  ${MEDIA_QUERY_SM} {
+    max-width: 85%;
+  }
+`
+
+const SelfMessageContent = styled.p`
+  padding: 7px 15px;
+  margin-left: 10px;
+  max-width: calc(100% - 64px);
   height: fit-content;
   background-color: #00b9a3;
   color: #ffffff;
   border-radius: 10px 0 10px 10px;
-
-  ${MEDIA_QUERY_SM} {
-    max-width: 80%;
-  }
+  word-wrap: break-word;
 `
 
-const UserMessageContainer = styled.div`
-  display: flex;
-  margin: 7.5px auto 7.5px 0;
-  max-width: 45%;
+const MessageContentContainer = styled.div`
+    display: flex;
+    margin: 7.5px auto 7.5px 0;
+    max-width: 45%;
 
   ${MEDIA_QUERY_SM} {
-    max-width: 90%;
+    width: 100%;
+    max-width: 85%;
   }
 `
 
@@ -222,13 +237,26 @@ const UserName = styled.p`
   font-size: 0.8125rem;
 `
 
-const UserMessage = styled.p`
-  padding: 7px 15px;
-  background-color: #fff;
-  border-radius: 0 10px 10px 10px;
+const UserMessage = styled.div`
+  display: flex;
+  align-items: flex-end;
 `
 
-const InputField = styled.div`
+const MessageContent = styled.p`
+  margin-right: 10px;
+  padding: 7px 15px;
+  max-width: calc(100% - 64px);
+  background-color: #fff;
+  border-radius: 0 10px 10px 10px;
+  word-wrap: break-word;
+`
+
+const MessageContentTime = styled.p`
+  font-size: 0.75rem;
+  color: #aaaaaa;
+`
+
+const InputField = styled.form`
   position: relative;
 `
 
@@ -261,7 +289,7 @@ const Emoji = styled.div`
   }
 `
 
-const SendButton = styled.div`
+const SendButton = styled.button`
   position: absolute;
   top: 50%;
   right: 20px;
@@ -272,6 +300,7 @@ const SendButton = styled.div`
   width: 35px;
   height: 35px;
   border-radius: 50%;
+  border: none;
   background-color: #00b9a3;
   cursor: pointer;
   transition: 0.3s;
@@ -286,10 +315,73 @@ const SendButton = styled.div`
 `
 
 export default function ChatPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [latestmessage, setLatestMessage] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [currentMessage, setCurrentMessage] = useState([]);
+  // const [onlineUserList, setOnlineUserList] = useState([]);
+  const { isUserLogin, currentUser } = useContext(AuthContext);
+  const { roomId } = useParams();
+  const history = useHistory();
+  const userData = JSON.parse(getUser('user'));
+  
+  const getMessageData = (roomId) => {
+    database.ref(`messages/${roomId}`).on('value', (snapshot) => {
+      const objectResponse = snapshot.val();
+      if (objectResponse) {
+        const arrayData = Object.keys(objectResponse).map((_) => objectResponse[_]);
+        setLatestMessage(arrayData)
+        setMessages(arrayData)
+      }
+    })
+  }
+  
+  // const getOnlineUser = (roomId) => {
+  //   database.ref(`onlineUser/${roomId}`).limitToLast(1).on('value', (snapshot) => {
+  //     const objectResponse = snapshot.val();
+  //     if (objectResponse) {
+  //       const arrayData = Object.keys(objectResponse).map((_) => objectResponse[_]);
+  //       console.log(arrayData)
+  //       setOnlineUserList([
+  //         ...onlineUserList,
+  //         arrayData[0]
+  //       ])
+  //     }
+  //   })
+  // }
+
+  useEffect(() => {
+    if (!isUserLogin) {
+      history.push("/");
+      return
+    }
+
+    getMessageData(roomId)
+    writeOnlineState(roomId, userData.username)
+    enterChatRoom(roomId, userData.username, true)
+  }, [history, isUserLogin, roomId, userData.username, userData.avatar])
 
   const handleSidebarOpen = () => {
     setIsSidebarOpen(!isSidebarOpen)
+  }
+
+  const handleInputChange = e => {
+    setCurrentMessage(e.target.value)
+  }
+
+  const handleMessageSubmit = e => {
+    e.preventDefault();
+    if (!currentMessage) return
+
+    sendMessage({ 
+      roomId, 
+      message: currentMessage, 
+      username: userData.username,
+      avatar: userData.avatar,
+      isSystemMessage: false
+    })
+
+    window.scrollTo(0, document.body.scrollHeight)
   }
 
   return (
@@ -297,49 +389,51 @@ export default function ChatPage() {
       <ChatContainer>
         <Chat>
           <ChatName>
-            聊天室名稱
+            { roomId === 'lobby' ? '聊天大廳' : `房間編號 ${roomId}`}
             <ChatCloseIcon />
           </ChatName>
           <Sidebar isSidebarOpen={isSidebarOpen}>
             <MyselfInfo>
               <MyselfImages />
-              Mily
+              {userData.username}
             </MyselfInfo>
-            <OnlineUsers>線上人數 0 人</OnlineUsers>
+            {/* <OnlineUsers>線上人數 {onlineUserList.length} 人</OnlineUsers>
             <UserList>
-              <User>用戶一號</User>
-              <User>用戶二號</User>
-              <User>用戶三號</User>
-            </UserList>
+              { onlineUserList.map(user => <User>{user.username}</User>)}
+            </UserList> */}
           </Sidebar>
           <CloseSidebarButton onClick={handleSidebarOpen} isSidebarOpen={isSidebarOpen}>
             <ArrowLeftIcon />
           </CloseSidebarButton>
           <Content isSidebarOpen={isSidebarOpen}>
             <ChatContent>
-              <UserJoinChat>Mily 加入聊天室</UserJoinChat>
-              <MyselfMessage>哈囉！你們好</MyselfMessage>
-              <UserMessageContainer>
-                <UserImages background="#77bce2" />
-                <UserInfo>
-                  <UserName>用戶一號</UserName>
-                  <UserMessage>嗨</UserMessage>
-                </UserInfo>
-              </UserMessageContainer>
-              <UserMessageContainer>
-                <UserImages background="#93a5d2" />
-                <UserInfo>
-                  <UserName>用戶二號</UserName>
-                  <UserMessage>歡迎歡迎</UserMessage>
-                </UserInfo>
-              </UserMessageContainer>
+              { messages && messages.map(message => {
+                if (message.isSystemMessage) return (<UserJoinChat key={message.id}>{message.username + ' 加入聊天室'} </UserJoinChat>)
+                return currentUser.username === message.username && !message.isSystemMessage ? (
+                  <SelfMessage key={message.id}>
+                    <MessageContentTime>{new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true})}</MessageContentTime>
+                    <SelfMessageContent>{message.message}</SelfMessageContent>
+                  </SelfMessage>
+                ):(
+                  <MessageContentContainer key={message.id}>
+                      <UserImages background={message.avatar} />
+                      <UserInfo>
+                        <UserName>{message.username}</UserName>
+                        <UserMessage>
+                          <MessageContent>{message.message}</MessageContent>
+                          <MessageContentTime>{new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true})}</MessageContentTime>
+                        </UserMessage>
+                      </UserInfo>
+                 </MessageContentContainer>
+                )
+              })}
             </ChatContent>
-            <InputField>
+            <InputField onSubmit={handleMessageSubmit}>
               <Emoji>
                 <EmojiIcon />
               </Emoji>
-              <Input placeholder="輸入想說的話" />
-              <SendButton>
+              <Input placeholder="輸入想說的話" onChange={handleInputChange} />
+              <SendButton type="submit">
                 <SendIcon />
               </SendButton>
             </InputField>

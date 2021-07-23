@@ -7,15 +7,19 @@ import { AuthContext } from "./contexts";
 
 export default function App() {
   const [isUserLogin, setIsUserLogin] = useState(false);
+  const [currentUser, setCurrentUser] = useState({
+    username: "",
+    avatar: "",
+  });
 
   return (
-    <AuthContext.Provider value={{ isUserLogin, setIsUserLogin }}>
+    <AuthContext.Provider value={{ isUserLogin, setIsUserLogin, currentUser, setCurrentUser }}>
       <HashRouter>
         <GlobalStyle />
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/mode" component={ModePage} />
-          <Route path="/chat/:id" component={ChatPage} />
+          <Route path="/chat/:roomId" component={ChatPage} />
         </Switch>
         <Footer />
       </HashRouter>
