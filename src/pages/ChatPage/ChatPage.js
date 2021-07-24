@@ -136,7 +136,7 @@ const MyselfImages = styled.div`
   width: 18px;
   height: 18px;
   margin-right: 8px;
-  background-color: #b59a92;
+  background-color: ${props => props.avatar};
   border-radius: 50%;
 `
 
@@ -394,7 +394,7 @@ export default function ChatPage() {
           </ChatName>
           <Sidebar isSidebarOpen={isSidebarOpen}>
             <MyselfInfo>
-              <MyselfImages />
+              <MyselfImages avatar={userData.avatar} />
               {userData.username}
             </MyselfInfo>
             {/* <OnlineUsers>線上人數 {onlineUserList.length} 人</OnlineUsers>
