@@ -190,10 +190,10 @@ const SelfMessage = styled.div`
   justify-content: flex-end;
   align-items: flex-end;
   margin: 7.5px 0 7.5px auto;
-  max-width: 45%;
+  max-width: 80%;
 
   ${MEDIA_QUERY_SM} {
-    max-width: 85%;
+    max-width: 100%;
   }
 `
 
@@ -211,11 +211,11 @@ const SelfMessageContent = styled.p`
 const MessageContentContainer = styled.div`
     display: flex;
     margin: 7.5px auto 7.5px 0;
-    max-width: 45%;
+    max-width: 80%;
 
   ${MEDIA_QUERY_SM} {
     width: 100%;
-    max-width: 85%;
+    max-width: 100%;
   }
 `
 
@@ -381,7 +381,7 @@ export default function ChatPage() {
       isSystemMessage: false
     })
 
-    window.scrollTo(0, document.body.scrollHeight)
+    setCurrentMessage('')
   }
 
   return (
@@ -432,7 +432,7 @@ export default function ChatPage() {
               <Emoji>
                 <EmojiIcon />
               </Emoji>
-              <Input placeholder="輸入想說的話" onChange={handleInputChange} />
+              <Input placeholder="輸入想說的話" value={currentMessage} onChange={handleInputChange} />
               <SendButton type="submit">
                 <SendIcon />
               </SendButton>
