@@ -17,6 +17,10 @@ const ChatContainer = styled.div`
   width: 100%;
   max-width: 840px;
   height: 650px;
+
+  ${MEDIA_QUERY_SM} {
+    height: calc((100vh - 60px) *0.8)
+  }
 `
 
 const Chat = styled.div`
@@ -193,6 +197,7 @@ const SelfMessage = styled.div`
   max-width: 80%;
 
   ${MEDIA_QUERY_SM} {
+    display: -webkit-box;
     max-width: 100%;
   }
 `
@@ -214,6 +219,7 @@ const MessageContentContainer = styled.div`
     max-width: 80%;
 
   ${MEDIA_QUERY_SM} {
+    display: -webkit-box;
     width: 100%;
     max-width: 100%;
   }
@@ -254,6 +260,11 @@ const MessageContent = styled.p`
 const MessageContentTime = styled.p`
   font-size: 0.75rem;
   color: #aaaaaa;
+
+  ${MEDIA_QUERY_SM} {
+    display: -webkit-flex;
+    align-items: flex-end;
+  }
 `
 
 const InputField = styled.form`
