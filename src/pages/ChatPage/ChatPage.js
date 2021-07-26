@@ -16,11 +16,8 @@ const ChatContainer = styled.div`
   padding: 20px;
   width: 100%;
   max-width: 840px;
-  height: 650px;
-
-  ${MEDIA_QUERY_SM} {
-    height: calc((100vh - 60px) *0.8)
-  }
+  height: calc((100vh - 60px) * 0.8);
+  max-height: 800px;
 `
 
 const Chat = styled.div`
@@ -158,12 +155,10 @@ const Content = styled.section`
 `
 
 const ChatContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 0 10px;
   height: calc(100% - 70px);
   overflow: auto;
+  overflow-x:hidden;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -181,25 +176,20 @@ const ChatContent = styled.div`
 `
 
 const UserJoinChat = styled.p`
-  display: inline-block;
+  margin: 15px auto;
   padding: 5px 15px;
+  width: fit-content;
   background-color: #e9e9e9;
   border-radius: 20px;
   font-size: 0.875rem;
-  margin: 7.5px 0;
 `
 
 const SelfMessage = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  margin: 7.5px 0 7.5px auto;
+  margin: 15px 0 15px auto;
   max-width: 80%;
-
-  ${MEDIA_QUERY_SM} {
-    display: -webkit-box;
-    max-width: 100%;
-  }
 `
 
 const SelfMessageContent = styled.p`
@@ -219,7 +209,6 @@ const MessageContentContainer = styled.div`
     max-width: 80%;
 
   ${MEDIA_QUERY_SM} {
-    display: -webkit-box;
     width: 100%;
     max-width: 100%;
   }
@@ -260,11 +249,6 @@ const MessageContent = styled.p`
 const MessageContentTime = styled.p`
   font-size: 0.75rem;
   color: #aaaaaa;
-
-  ${MEDIA_QUERY_SM} {
-    display: -webkit-flex;
-    align-items: flex-end;
-  }
 `
 
 const InputField = styled.form`
@@ -366,13 +350,19 @@ export default function ChatPage() {
       history.push('/');
       return
     }
-
     scrollToTop();
+  }, [history, isUserLogin])
 
+  useEffect(() => {
     getMessageData(roomId);
     writeOnlineState(roomId, userData.username);
     enterChatRoom(roomId, userData.username, true);
-  }, [history, isUserLogin, roomId, userData.username, userData.avatar])
+  }, [roomId, userData.username])
+
+  useEffect(() => {
+    const isResized = document.querySelector('.resized');
+    isResized.scrollTo(0, isResized.scrollHeight);
+  }, [messages])
 
   const handleSidebarOpen = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -394,7 +384,7 @@ export default function ChatPage() {
       isSystemMessage: false
     })
 
-    setCurrentMessage('')
+    setCurrentMessage('');
   }
 
   return (
@@ -419,7 +409,7 @@ export default function ChatPage() {
             <ArrowLeftIcon />
           </CloseSidebarButton>
           <Content isSidebarOpen={isSidebarOpen}>
-            <ChatContent>
+            <ChatContent className="resized">
               { messages && messages.map(message => {
                 if (message.isSystemMessage) return (<UserJoinChat key={message.id}>{message.username + ' 加入聊天室'} </UserJoinChat>)
                 return currentUser.username === message.username && !message.isSystemMessage ? (
