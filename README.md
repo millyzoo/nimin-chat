@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+## NiMin Chat
+NiMin Chat 為匿名聊天平台，提供使用者抒發心情、輕鬆聊天。
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+☞ [DEMO](https://milyzoo.github.io/nimin-chat/)
 
-## Available Scripts
+![](images/screenshots-main.png)
 
-In the project directory, you can run:
+### 待修正項目
+此專案仍進行中，以下為待修正之功能：
+1. 當使用者進入聊天室時，不顯示歷史訊息
+2. 當使用者離開聊天室時，顯示系統訊息
+3. 顯示在線使用者
+4. 支援表情符號功能
 
-### `yarn start`
+## 目錄
+- [專案功能](#專案功能)
+- [使用技術](#使用技術)
+- [功能說明](#功能說明)
+- [運行專案](#運行專案)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 專案功能
+- 使用者不需進行註冊，即可使用自訂暱稱進入聊天室
+- 使用者可自行選擇聊天方式，包含大廳模式、自行建立聊天室房間及加入指定聊天室房間等
+- 可以使用內建的表情符號（待製作）
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 使用技術
+### 前端
+- 以 React 開發，使用 function component 並搭配 Hooks API
+- 使用 React Context 管理組件狀態
+- 使用 React-router 處理前端路由
+- 支援 RWD，使用 styled-components 進行排版
+- 搭配 Prettier、ESLint 統一程式碼格式
 
-### `yarn test`
+### 後端
+- 使用 Firebase Realtime Database 儲存資料，並即時同步至所連線的用戶端
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 功能說明
 
-### `yarn build`
+### 首頁
+![](images/screenshots-homepage.png)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 聊天室介面
+![](images/screenshots-chat.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 建立與加入聊天室
+![](images/screenshots-create-join.png)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 運行專案
+如果要在本機端啟動專案，需先安裝 Node.js 再進行以下步驟。
 
-### `yarn eject`
+### 下載專案
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+將專案下載至本機端。
+```
+$ git clone https://github.com/milyzoo/nimin-chat.git
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 安裝套件
+```
+$ yarn install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 啟動專案
+啟動後，可於任一瀏覽器以 http://localhost:3000 進行結果預覽。
+```
+$ yarn start
+```
