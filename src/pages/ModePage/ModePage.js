@@ -1,15 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
-import styled from "styled-components";
-import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
-import { Wrapper, SubmitButton } from "../../constants/mainStyle";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
+import { Wrapper, SubmitButton } from '../../constants/mainStyle';
+import { Link } from 'react-router-dom';
 import { FaUsers as UsersIcon, FaDoorOpen as DoorIcon } from 'react-icons/fa';
 import { BiMessageAdd as MessageAddIcon } from 'react-icons/bi';
 import { IoIosClose as CloseIcon } from 'react-icons/io';
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 import { addChatRoom } from '../../WebAPI'
 import firebase from 'firebase';
 import { AuthContext } from '../../contexts';
+import { scrollToTop } from '../../utils';
 
 const Container = styled.div`
   width: 280px;
@@ -142,28 +143,30 @@ const Input = styled.input`
 export default function ModePage() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [createRoomId, setCreateRoomId] = useState("")
-  const [joinRoomId, setJoinRoomId] = useState("")
-  const [errorMessages, setErrorMessages] = useState("");
+  const [createRoomId, setCreateRoomId] = useState('')
+  const [joinRoomId, setJoinRoomId] = useState('')
+  const [errorMessages, setErrorMessages] = useState('');
   const history = useHistory();
   const reference = firebase.database().ref('chats').orderByChild('roomID')
   const { isUserLogin } = useContext(AuthContext)
 
   useEffect(() => {
     if (!isUserLogin) {
-      history.push("/");
+      history.push('/');
       return
     }
   }, [history, isUserLogin])
 
+  scrollToTop();
+
   const handleJoinModalClick = () => {
     setIsJoinModalOpen(!isJoinModalOpen);
-    setErrorMessages("")
+    setErrorMessages('');
   };
 
   const handleCreateModalClick = () => {
     setIsCreateModalOpen(!isCreateModalOpen);
-    setErrorMessages("")
+    setErrorMessages('');
   };
 
   const handleJoinRoomSubmit = e => {
@@ -171,12 +174,12 @@ export default function ModePage() {
 
     reference.equalTo(joinRoomId).once('value', (snapshot) => {
       if (!joinRoomId) {
-        setErrorMessages('尚未輸入房間編號')
+        setErrorMessages('尚未輸入房間編號');
         return
       }
 
       if (!snapshot.val()) {
-        setErrorMessages('此房間不存在')
+        setErrorMessages('此房間不存在');
         return
       }
       
@@ -189,12 +192,12 @@ export default function ModePage() {
 
     reference.equalTo(createRoomId).once('value', (snapshot) => {
       if (!createRoomId) {
-        setErrorMessages('尚未輸入房間編號')
+        setErrorMessages('尚未輸入房間編號');
         return
       }
 
       if (snapshot.val()) {
-        setErrorMessages('此房間已存在')
+        setErrorMessages('此房間已存在');
         return
       }
       
@@ -204,11 +207,11 @@ export default function ModePage() {
   }
   
   const handleCreateRoomIDChange = e => {
-    setCreateRoomId(e.target.value)
+    setCreateRoomId(e.target.value);
   }
   
   const handleJoinRoomIDChange = e => {
-    setJoinRoomId(e.target.value)
+    setJoinRoomId(e.target.value);
   }
 
   return (

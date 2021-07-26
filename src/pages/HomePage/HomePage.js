@@ -1,11 +1,11 @@
-import React, { useState, useContext } from "react";
-import styled from "styled-components";
-import { useHistory } from "react-router-dom";
-import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
-import { Wrapper, SubmitButton } from "../../constants/mainStyle";
-import { AuthContext } from "../../contexts";
-import { setUser } from "../../utils";
-import AvatarOptionInput from "./../../components/AvatarOptionInput";
+import React, { useState, useContext } from 'react';
+import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
+import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
+import { Wrapper, SubmitButton } from '../../constants/mainStyle';
+import { AuthContext } from '../../contexts';
+import { setUser } from '../../utils';
+import AvatarOptionInput from './../../components/AvatarOptionInput';
 
 const Form = styled.form`
   padding: 40px;
@@ -63,50 +63,50 @@ const AvatarContainer = styled.div`
 `;
 
 export default function HomePage() {
-  const [errorMessages, setErrorMessages] = useState("");
+  const [errorMessages, setErrorMessages] = useState('');
   const { setIsUserLogin, currentUser, setCurrentUser } = useContext(AuthContext);
   const history = useHistory();
 
   const avatarbackground = [
-    { id: "option1", background: "#e0969b" },
-    { id: "option2", background: "#b59a92" },
-    { id: "option3", background: "#77bce2" },
-    { id: "option4", background: "#93a5d2" },
+    { id: "option1", background: '#e0969b' },
+    { id: "option2", background: '#b59a92' },
+    { id: "option3", background: '#77bce2' },
+    { id: "option4", background: '#93a5d2' },
   ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!currentUser.username && !currentUser.avatar) {
-      setErrorMessages("資料填寫不齊全");
+      setErrorMessages('資料填寫不齊全');
       return;
     } else if (!currentUser.username) {
-      setErrorMessages("尚未填寫名字");
+      setErrorMessages('尚未填寫名字');
       return;
     } else if (!currentUser.avatar) {
-      setErrorMessages("尚未選擇頭貼");
+      setErrorMessages('尚未選擇頭貼');
       return;
     }
-    setErrorMessages("");
+    setErrorMessages('');
     setUser(currentUser);
     setIsUserLogin(true);
-    history.push("/mode");
+    history.push('/mode');
   };
 
   const handleUserInfoChange = (e) => {
     switch (e.target.name) {
-      case "username":
+      case 'username':
         setCurrentUser({
           ...currentUser,
           username: e.target.value,
         });
-        setErrorMessages("");
+        setErrorMessages('');
         break;
-      case "avatar":
+      case 'avatar':
         setCurrentUser({
           ...currentUser,
           avatar: e.target.value,
         });
-        setErrorMessages("");
+        setErrorMessages('');
         break;
       default:
         break;

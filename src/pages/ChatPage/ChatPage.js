@@ -1,14 +1,14 @@
-import React, { useState, useContext, useEffect } from "react";
-import styled from "styled-components";
-import { MEDIA_QUERY_SM } from "../../constants/breakpoint";
-import { Wrapper } from "../../constants/mainStyle";
+import React, { useState, useContext, useEffect } from 'react';
+import styled from 'styled-components';
+import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
+import { Wrapper } from '../../constants/mainStyle';
 import { FiSmile as EmojiIcon } from 'react-icons/fi';
-import { IoCloseCircle as ChatCloseIcon, IoSend as SendIcon } from "react-icons/io5";
-import { RiArrowLeftSLine as ArrowLeftIcon } from "react-icons/ri";
+import { IoCloseCircle as ChatCloseIcon, IoSend as SendIcon } from 'react-icons/io5';
+import { RiArrowLeftSLine as ArrowLeftIcon } from 'react-icons/ri';
 import { AuthContext } from '../../contexts';
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory } from 'react-router-dom';
 import database from '../../config';
-import { getUser } from '../../utils'
+import { getUser, scrollToTop } from '../../utils'
 import { enterChatRoom, sendMessage, writeOnlineState } from '../../WebAPI'
 
 const ChatContainer = styled.div`
@@ -341,8 +341,8 @@ export default function ChatPage() {
       const objectResponse = snapshot.val();
       if (objectResponse) {
         const arrayData = Object.keys(objectResponse).map((_) => objectResponse[_]);
-        setLatestMessage(arrayData)
-        setMessages(arrayData)
+        setLatestMessage(arrayData);
+        setMessages(arrayData);
       }
     })
   }
@@ -363,21 +363,23 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!isUserLogin) {
-      history.push("/");
+      history.push('/');
       return
     }
 
-    getMessageData(roomId)
-    writeOnlineState(roomId, userData.username)
-    enterChatRoom(roomId, userData.username, true)
+    scrollToTop();
+
+    getMessageData(roomId);
+    writeOnlineState(roomId, userData.username);
+    enterChatRoom(roomId, userData.username, true);
   }, [history, isUserLogin, roomId, userData.username, userData.avatar])
 
   const handleSidebarOpen = () => {
-    setIsSidebarOpen(!isSidebarOpen)
+    setIsSidebarOpen(!isSidebarOpen);
   }
 
   const handleInputChange = e => {
-    setCurrentMessage(e.target.value)
+    setCurrentMessage(e.target.value);
   }
 
   const handleMessageSubmit = e => {
