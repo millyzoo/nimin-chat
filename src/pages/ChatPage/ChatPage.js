@@ -62,10 +62,9 @@ const Sidebar = styled.aside`
   height: 100%;
   background-color: #fff;
   border-radius: 15px;
-  display: ${props => props.isSidebarOpen ? "block" : "none"};
+  display: ${props => props.isSidebarOpen ? "none" : "block"};
 
   ${MEDIA_QUERY_SM} {
-    display: ${props => props.isSidebarOpen ? "none" : "block"};
     width: ${props => props.isSidebarOpen ? "0" : "100%"};
   }
 `
@@ -100,38 +99,38 @@ const MyselfInfo = styled.div`
   border-bottom: 1px solid #e9e9e9;
 `
 
-const OnlineUsers = styled.p`
-  font-size: 0.815rem;
-  color: #aaaaaa;
-`
+// const OnlineUsers = styled.p`
+//   font-size: 0.815rem;
+//   color: #aaaaaa;
+// `
 
-const UserList = styled.ul`
-  margin: 20px 0 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.9375rem;
-`
+// const UserList = styled.ul`
+//   margin: 20px 0 0 0;
+//   padding: 0;
+//   list-style: none;
+//   font-size: 0.9375rem;
+// `
 
-const User = styled.li`
-  position: relative;
-  padding-left: 13px;
+// const User = styled.li`
+//   position: relative;
+//   padding-left: 13px;
 
-  &::before {
-    position: absolute;
-    content: "";
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #00b9a3;
-  }
+//   &::before {
+//     position: absolute;
+//     content: "";
+//     left: 0;
+//     top: 50%;
+//     transform: translateY(-50%);
+//     width: 6px;
+//     height: 6px;
+//     border-radius: 50%;
+//     background-color: #00b9a3;
+//   }
 
-  & + & {
-    margin-top: 10px;
-  }
-`
+//   & + & {
+//     margin-top: 10px;
+//   }
+// `
 
 const MyselfImages = styled.div`
   width: 18px;
@@ -146,7 +145,7 @@ const Content = styled.section`
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  width: ${props => props.isSidebarOpen ? "calc(100% - 200px)" : "100%"};
+  width: ${props => props.isSidebarOpen ? "100%" : "calc(100% - 200px)"};
 
   ${MEDIA_QUERY_SM} {
     display: ${props => props.isSidebarOpen ? "flex" : "none"};
@@ -311,10 +310,8 @@ const SendButton = styled.button`
 
 export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [latestmessage, setLatestMessage] = useState([]);
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState([]);
-  // const [onlineUserList, setOnlineUserList] = useState([]);
   const { isUserLogin, currentUser } = useContext(AuthContext);
   const { roomId } = useParams();
   const history = useHistory();
@@ -325,25 +322,10 @@ export default function ChatPage() {
       const objectResponse = snapshot.val();
       if (objectResponse) {
         const arrayData = Object.keys(objectResponse).map((_) => objectResponse[_]);
-        setLatestMessage(arrayData);
         setMessages(arrayData);
       }
     })
   }
-  
-  // const getOnlineUser = (roomId) => {
-  //   database.ref(`onlineUser/${roomId}`).limitToLast(1).on('value', (snapshot) => {
-  //     const objectResponse = snapshot.val();
-  //     if (objectResponse) {
-  //       const arrayData = Object.keys(objectResponse).map((_) => objectResponse[_]);
-  //       console.log(arrayData)
-  //       setOnlineUserList([
-  //         ...onlineUserList,
-  //         arrayData[0]
-  //       ])
-  //     }
-  //   })
-  // }
 
   useEffect(() => {
     if (!isUserLogin) {

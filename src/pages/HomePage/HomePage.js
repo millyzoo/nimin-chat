@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
 import { Wrapper, SubmitButton } from '../../constants/mainStyle';
 import { AuthContext } from '../../contexts';
-import { setUser } from '../../utils';
+import { setUser, checkTextFormat } from '../../utils';
 import AvatarOptionInput from './../../components/AvatarOptionInput';
 
 const Form = styled.form`
@@ -76,6 +76,7 @@ export default function HomePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!currentUser.username && !currentUser.avatar) {
       setErrorMessages('資料填寫不齊全');
       return;
@@ -86,6 +87,9 @@ export default function HomePage() {
       setErrorMessages('尚未選擇頭貼');
       return;
     }
+
+    if (!checkTextFormat(currentUser.username, 8, setErrorMessages)) return;
+
     setErrorMessages('');
     setUser(currentUser);
     setIsUserLogin(true);

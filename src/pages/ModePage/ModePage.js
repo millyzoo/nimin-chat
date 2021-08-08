@@ -10,7 +10,7 @@ import { useHistory } from 'react-router-dom';
 import { addChatRoom } from '../../WebAPI'
 import firebase from 'firebase';
 import { AuthContext } from '../../contexts';
-import { scrollToTop } from '../../utils';
+import { scrollToTop, checkTextFormat } from '../../utils';
 
 const Container = styled.div`
   width: 280px;
@@ -200,6 +200,8 @@ export default function ModePage() {
         setErrorMessages('此房間已存在');
         return
       }
+
+      if (!checkTextFormat(createRoomId, 8, setErrorMessages)) return;
       
       addChatRoom(createRoomId)
       history.push(`/chat/${createRoomId}`);
