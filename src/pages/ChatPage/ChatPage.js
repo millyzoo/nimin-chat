@@ -205,6 +205,7 @@ const SelfMessageContent = styled.p`
   color: #ffffff;
   border-radius: 10px 0 10px 10px;
   word-wrap: break-word;
+  white-space: pre;
 `
 
 const MessageContentContainer = styled.div`
@@ -365,7 +366,8 @@ export default function ChatPage() {
 
   const handleMessageSubmit = e => {
     e.preventDefault();
-    if (!currentMessage) return
+
+    if (!currentMessage.replace(/\s/g, '')) return;
 
     sendMessage({ 
       roomId, 
