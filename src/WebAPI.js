@@ -6,13 +6,25 @@ export const addChatRoom = (roomID) => {
   });
 }
   
-export const enterChatRoom = (roomId, username, isSystemMessage) => {
+export const enterChatRoom = (roomId, username) => {
   database.ref(`messages/${roomId}`).push({
     id: {  
       '.sv':'timestamp'
     },
     username,
-    isSystemMessage,
+    isSystemMessage: true,
+    isInTheRoom: true,
+  });
+}
+  
+export const leaveChatRoom = (roomId, username) => {
+  database.ref(`messages/${roomId}`).push({
+    id: {  
+      '.sv':'timestamp'
+    },
+    username,
+    isSystemMessage: true,
+    isInTheRoom: false,
   });
 }
   

@@ -2,14 +2,14 @@ import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { MEDIA_QUERY_SM } from '../../constants/breakpoint';
 import { Wrapper } from '../../constants/mainStyle';
-import { FiSmile as EmojiIcon } from 'react-icons/fi';
-import { IoCloseCircle as ChatCloseIcon, IoSend as SendIcon } from 'react-icons/io5';
+import { FiSmile as EmojiIcon, FiLogOut as LeaveRoomIcon } from 'react-icons/fi';
+import { IoSend as SendIcon } from 'react-icons/io5';
 import { RiArrowLeftSLine as ArrowLeftIcon } from 'react-icons/ri';
 import { AuthContext } from '../../contexts';
 import { useParams, useHistory } from 'react-router-dom';
 import database from '../../config';
 import { getUser, scrollToTop } from '../../utils'
-import { enterChatRoom, sendMessage, writeOnlineState } from '../../WebAPI'
+import { enterChatRoom, sendMessage, writeOnlineState, leaveChatRoom } from '../../WebAPI'
 
 const ChatContainer = styled.div`
   margin-top: 40px;
@@ -32,27 +32,13 @@ const Chat = styled.div`
 
 const ChatName = styled.div`
   position: absolute;
-  top: -40px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px 0 70px;
-  line-height: 40px;
+  top: -30px;
+  left: 30px;
+  padding: 0 30px;
+  line-height: 30px;
   background-color: #cccccc;
   border-radius: 10px 10px 0 0;
   font-size: 0.9375rem;
-  
-  svg {
-    margin-left: 50px;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-
-    &:hover {
-      color: #d62f39;
-    }
-  }
 `
 
 const Sidebar = styled.aside`
@@ -138,6 +124,25 @@ const MyselfImages = styled.div`
   margin-right: 8px;
   background-color: ${props => props.avatar};
   border-radius: 50%;
+`
+
+const LeaveRoomButton = styled.div`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 25px;
+  cursor: pointer;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    color: #cccccc;
+    transition: 0.3s;
+
+    &:hover {
+      color: #505050;
+    }
+  }
 `
 
 const Content = styled.section`
@@ -338,7 +343,11 @@ export default function ChatPage() {
   useEffect(() => {
     getMessageData(roomId);
     writeOnlineState(roomId, userData.username);
-    enterChatRoom(roomId, userData.username, true);
+    enterChatRoom(roomId, userData.username);
+
+    return () => {
+      leaveChatRoom(roomId, userData.username);
+    }
   }, [roomId, userData.username])
 
   useEffect(() => {
@@ -369,14 +378,15 @@ export default function ChatPage() {
     setCurrentMessage('');
   }
 
+  const handleLeaveRoom = () => {
+    history.push('/mode');
+  }
+
   return (
     <Wrapper>
       <ChatContainer>
         <Chat>
-          <ChatName>
-            { roomId === 'lobby' ? '聊天大廳' : `房間編號 ${roomId}`}
-            <ChatCloseIcon />
-          </ChatName>
+          <ChatName>{ roomId === 'lobby' ? '聊天大廳' : `房間編號 ${roomId}`}</ChatName>
           <Sidebar isSidebarOpen={isSidebarOpen}>
             <MyselfInfo>
               <MyselfImages avatar={userData.avatar} />
@@ -386,6 +396,9 @@ export default function ChatPage() {
             <UserList>
               { onlineUserList.map(user => <User>{user.username}</User>)}
             </UserList> */}
+            <LeaveRoomButton onClick={handleLeaveRoom}>
+              <LeaveRoomIcon />
+            </LeaveRoomButton>
           </Sidebar>
           <CloseSidebarButton onClick={handleSidebarOpen} isSidebarOpen={isSidebarOpen}>
             <ArrowLeftIcon />
@@ -393,7 +406,8 @@ export default function ChatPage() {
           <Content isSidebarOpen={isSidebarOpen}>
             <ChatContent className="resized">
               { messages && messages.map(message => {
-                if (message.isSystemMessage) return (<UserJoinChat key={message.id}>{message.username + ' 加入聊天室'} </UserJoinChat>)
+                if (message.isSystemMessage && message.isInTheRoom) return (<UserJoinChat key={message.id}>{message.username + ' 加入聊天室'} </UserJoinChat>)
+                if (message.isSystemMessage && !message.isInTheRoom) return (<UserJoinChat key={message.id}>{message.username + ' 離開聊天室'} </UserJoinChat>)
                 return currentUser.username === message.username && !message.isSystemMessage ? (
                   <SelfMessage key={message.id}>
                     <MessageContentTime>{new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true})}</MessageContentTime>
